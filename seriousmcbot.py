@@ -2,15 +2,16 @@ import discord
 from discord.ext import commands
 import requests
 import os
-from flask import Flask, jsonify  # Import Flask module
+from flask import Flask, jsonify
 
 DISCORD_TOKEN = os.getenv('DISCORD_TOKEN')
 
 COIN_SYMBOL = 'SERIOUS'
 
-# Define intents
+# Define intents with required flags
 intents = discord.Intents.default()
-intents.messages = True
+intents.messages = True  # Required for the bot to receive message events
+intents.message_content = True  # Required for the bot to access message content
 
 # Initialize the bot with intents
 bot = commands.Bot(command_prefix='!', intents=intents)
@@ -33,6 +34,7 @@ async def marketcap(ctx):
             await ctx.send(f'Could not find market cap for {COIN_SYMBOL}')
     else:
         await ctx.send(f'Error fetching data: {response.status_code}')
+        print(response.text)  # Print the API response for debugging
 
 # Flask app for health check
 app = Flask(__name__)
