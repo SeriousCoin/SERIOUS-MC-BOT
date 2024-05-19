@@ -2,16 +2,17 @@ import discord
 from discord.ext import commands
 import requests
 import os
-from flask import Flask, jsonify
 
 DISCORD_TOKEN = os.getenv('DISCORD_TOKEN')
 
 COIN_SYMBOL = 'SERIOUS'
 
-# Initialize the bot
+# Define intents
 intents = discord.Intents.default()
 intents.messages = True
-bot = commands.Bot(command_prefix='!')
+
+# Initialize the bot with intents
+bot = commands.Bot(command_prefix='!', intents=intents)
 
 @bot.event
 async def on_ready():
@@ -19,7 +20,6 @@ async def on_ready():
 
 @bot.command()
 async def marketcap(ctx):
-    # Fetch data from Dexscreener API
     url = 'https://api.dexscreener.io/latest/dex/pairs/cronos/0x18ab7692cc20F68A550b1Fdd749720CAd4a4894F'
     response = requests.get(url)
 
