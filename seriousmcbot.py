@@ -1,7 +1,7 @@
 import discord
 import requests
 import os
-from flask import Flask
+from flask import Flask, jsonify
 
 DISCORD_TOKEN = os.getenv('DISCORD_TOKEN')
 
@@ -11,9 +11,6 @@ COIN_SYMBOL = 'SERIOUS'
 intents = discord.Intents.default()
 intents.messages = True
 client = discord.Client(intents=intents)
-
-# Initialize Flask app
-app = Flask(__name__)
 
 @client.event
 async def on_ready():
@@ -39,18 +36,28 @@ async def on_message(message):
         else:
             await message.channel.send(f'Error fetching data: {response.status_code}')
 
+# Flask app for health check
+app = Flask(__name__)
+
 @app.route('/')
 def index():
     return 'SERIOUS MC Bot is running!'
 
-def run_bot():
+@app.route('/health')
+def health_check():
+    return jsonify({'status': 'UP'})
+
+def run_discord_bot():
     client.run(DISCORD_TOKEN)
 
 if __name__ == '__main__':
-    # Run the bot and the Flask app
     import threading
-    bot_thread = threading.Thread(target=run_bot)
-    bot_thread.start()
+    from concurrent.futures import ThreadPoolExecutor
 
-    # Run Flask app
-    app.run(host='0.0.0.0', port=os.environ.get('PORT', 5000))
+    # Start the Flask app in a separate thread
+    flask_thread = threading.Thread(target=app.run, kwargs={'host': '0.0.0.0', 'port': int(os.environ.get('PORT', 5000))})
+    flask_thread.start()
+
+    # Start the Discord bot
+    with ThreadPoolExecutor() as executor:
+        executor.submit(run_discord_bot)
