@@ -1,5 +1,5 @@
 services:
-  - type: worker
+  - type: web
     name: SERIOUS-MC-BOT
     env: python
     plan: free

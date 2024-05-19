@@ -1,1 +1,1 @@
-worker: python seriousmcbot.py
+web: python seriousmcbot.py
