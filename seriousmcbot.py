@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 import requests
 import os
+from flask import Flask, jsonify  # Import Flask module
 
 DISCORD_TOKEN = os.getenv('DISCORD_TOKEN')
 
