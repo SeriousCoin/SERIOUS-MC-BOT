@@ -22,7 +22,7 @@ async def on_message(message):
 
     if message.content.startswith('!marketcap'):
         # Fetch data from Dexscreener API
-        url = f'https://api.dexscreener.io/latest/dex/pairs/cronos/{COIN_SYMBOL}'
+        url = f'https://api.dexscreener.io/latest/dex/pairs/cronos/0x18ab7692cc20F68A550b1Fdd749720CAd4a4894F'
         response = requests.get(url)
 
         if response.status_code == 200:
