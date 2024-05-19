@@ -1,0 +1,10 @@
+services:
+  - type: worker
+    name: SERIOUS-MC-BOT
+    env: python
+    plan: free
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "python seriousmcbot.py"
+    envVars:
+      - key: DISCORD_TOKEN
+        from: secret
