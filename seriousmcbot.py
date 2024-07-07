@@ -64,6 +64,15 @@ async def update_bot_nickname():
             logging.error("Failed to fetch market cap, skipping update.")
         await asyncio.sleep(60)  # Update every minute
 
+async def send_heartbeat():
+    while True:
+        try:
+            requests.get('http://localhost:5000')
+            logging.info("Heartbeat sent.")
+        except requests.exceptions.RequestException as e:
+            logging.error(f"Heartbeat failed: {e}")
+        await asyncio.sleep(300)  # Send heartbeat every 5 minutes
+
 @client.event
 async def on_ready():
     logging.info(f'Logged in as {client.user.name}')
@@ -82,6 +91,7 @@ async def main():
     
     async with client:
         client.loop.create_task(update_bot_nickname())
+        client.loop.create_task(send_heartbeat())
         await client.start(DISCORD_TOKEN)
 
 if __name__ == "__main__":
