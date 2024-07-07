@@ -12,6 +12,8 @@ logging.basicConfig(level=logging.INFO)
 
 DISCORD_TOKEN = os.getenv('DISCORD_TOKEN')
 TOKEN_ID = 'serious-coin'
+GUILD_ID = int(os.getenv('GUILD_ID'))
+
 intents = discord.Intents.default()
 client = discord.Client(intents=intents)
 
@@ -39,24 +41,26 @@ def get_market_cap(token_id):
         logging.error(f"Error parsing market cap data: {e}")
         return None
 
-async def update_bot_name():
+async def update_bot_nickname():
     await client.wait_until_ready()
-    previous_market_cap = None
+    guild = client.get_guild(GUILD_ID)
+    if guild is None:
+        logging.error(f"Guild with ID {GUILD_ID} not found")
+        return
+    
     while not client.is_closed():
         market_cap = get_market_cap(TOKEN_ID)
-        if market_cap is not None and market_cap != previous_market_cap:
-            new_name = f"$SERIOUS MC: ${market_cap}"
+        if market_cap is not None:
+            new_nickname = f"SERIOUS MC: ${market_cap}"
             try:
-                await client.user.edit(username=new_name)
-                logging.info(f"Updated bot name to: {new_name}")
-                previous_market_cap = market_cap
+                me = guild.me
+                await me.edit(nick=new_nickname)
+                logging.info(f"Updated bot nickname to: {new_nickname}")
             except discord.errors.HTTPException as e:
-                logging.error(f"Error updating bot name: {e}")
-                if "You are changing your username or Discord Tag too fast" in str(e):
-                    await asyncio.sleep(1800)  # Wait for 30 minutes before retrying
+                logging.error(f"Error updating bot nickname: {e}")
         else:
-            logging.info("Market cap did not change significantly or failed to fetch, skipping update.")
-        await asyncio.sleep(1800)  # Update every 30 minutes
+            logging.error("Failed to fetch market cap, skipping update.")
+        await asyncio.sleep(300)  # Update every 5 minutes
 
 @client.event
 async def on_ready():
@@ -75,7 +79,7 @@ async def main():
     flask_thread.start()
     
     async with client:
-        client.loop.create_task(update_bot_name())
+        client.loop.create_task(update_bot_nickname())
         await client.start(DISCORD_TOKEN)
 
 if __name__ == "__main__":
