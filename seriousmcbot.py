@@ -25,7 +25,7 @@ async def update_bot_name():
     while not client.is_closed():
         market_cap = get_market_cap(TOKEN_ID)
         if market_cap is not None:
-            new_name = f"$SERIOUS MC: ${market_cap}"
+            new_name = f"SERIOUS MC: ${market_cap}"
             try:
                 await client.user.edit(username=new_name)
                 print(f"Updated bot name to: {new_name}")
@@ -33,11 +33,16 @@ async def update_bot_name():
                 print(f"Error updating bot name: {e}")
         else:
             print("Failed to fetch market cap, skipping update.")
-        await asyncio.sleep(3600)  # Update every hour
+        await asyncio.sleep(300)  # Update every 5 minutes
 
 @client.event
 async def on_ready():
     print(f'Logged in as {client.user.name}')
 
-client.loop.create_task(update_bot_name())
-client.run(DISCORD_TOKEN)
+async def main():
+    async with client:
+        client.loop.create_task(update_bot_name())
+        await client.start(DISCORD_TOKEN)
+
+if __name__ == "__main__":
+    asyncio.run(main())
