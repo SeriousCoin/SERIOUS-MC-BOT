@@ -41,18 +41,22 @@ def get_market_cap(token_id):
 
 async def update_bot_name():
     await client.wait_until_ready()
+    previous_market_cap = None
     while not client.is_closed():
         market_cap = get_market_cap(TOKEN_ID)
-        if market_cap is not None:
+        if market_cap is not None and market_cap != previous_market_cap:
             new_name = f"$SERIOUS MC: ${market_cap}"
             try:
                 await client.user.edit(username=new_name)
                 logging.info(f"Updated bot name to: {new_name}")
+                previous_market_cap = market_cap
             except discord.errors.HTTPException as e:
                 logging.error(f"Error updating bot name: {e}")
+                if "You are changing your username or Discord Tag too fast" in str(e):
+                    await asyncio.sleep(1800)  # Wait for 30 minutes before retrying
         else:
-            logging.error("Failed to fetch market cap, skipping update.")
-        await asyncio.sleep(300)  # Update every 5 minutes
+            logging.info("Market cap did not change significantly or failed to fetch, skipping update.")
+        await asyncio.sleep(1800)  # Update every 30 minutes
 
 @client.event
 async def on_ready():
