@@ -6,7 +6,6 @@ import logging
 from flask import Flask
 from threading import Thread
 from time import sleep
-import random
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -15,14 +14,7 @@ DISCORD_TOKEN = os.getenv('DISCORD_TOKEN')
 TOKEN_ID = '0x18ab7692cc20F68A550b1Fdd749720CAd4a4894F'
 GUILD_ID = int(os.getenv('GUILD_ID'))  # The ID of the server (guild) where you want to change the nickname
 
-# List of GIF URLs
-GIFS = [
-    "https://tenor.com/view/wen-serious-crypto-meme-gif-16719925296958383434",
-    "https://tenor.com/view/serious-crypto-meme-toast-great-gatsby-gif-5956985317763125460"
-]
-
 intents = discord.Intents.default()
-intents.messages = True  # Enable message intent
 client = discord.Client(intents=intents)
 
 app = Flask(__name__)
@@ -76,19 +68,6 @@ async def update_bot_nickname():
 async def on_ready():
     logging.info(f'Logged in as {client.user.name}')
 
-@client.event
-async def on_message(message):
-    logging.info(f"Message received: {message.content}")
-    if message.author == client.user:
-        logging.info("Message is from the bot itself, ignoring.")
-        return
-
-    if message.content.lower() == "!serious":
-        logging.info("!serious command detected")
-        random_gif = random.choice(GIFS)
-        await message.channel.send(random_gif)
-        logging.info(f"Sent GIF: {random_gif}")
-        
 @app.route('/')
 def home():
     return "Discord bot is running!"
