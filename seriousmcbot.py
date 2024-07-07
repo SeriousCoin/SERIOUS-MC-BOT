@@ -12,7 +12,7 @@ logging.basicConfig(level=logging.INFO)
 
 DISCORD_TOKEN = os.getenv('DISCORD_TOKEN')
 TOKEN_ID = '0x18ab7692cc20F68A550b1Fdd749720CAd4a4894F'
-GUILD_ID = int(os.getenv('GUILD_ID'))
+GUILD_ID = int(os.getenv('GUILD_ID'))  # The ID of the server (guild) where you want to change the nickname
 
 intents = discord.Intents.default()
 client = discord.Client(intents=intents)
@@ -26,8 +26,10 @@ def get_market_cap(token_id):
         response.raise_for_status()  # Check for HTTP errors
         data = response.json()
         market_cap = data['pairs'][0]['fdv']  # Using FDV as market cap
-        logging.info(f"Market cap (FDV) fetched: {market_cap}")
-        return market_cap
+        market_cap_k = int(market_cap // 1000)  # Round down to nearest thousand
+        market_cap_k_str = f"{market_cap_k}K"
+        logging.info(f"Market cap (FDV) fetched: {market_cap}, formatted: {market_cap_k_str}")
+        return market_cap_k_str
     except requests.exceptions.HTTPError as e:
         if e.response.status_code == 429:
             retry_after = int(e.response.headers.get("Retry-After", 60))
@@ -51,7 +53,7 @@ async def update_bot_nickname():
     while not client.is_closed():
         market_cap = get_market_cap(TOKEN_ID)
         if market_cap is not None:
-            new_nickname = f"SERIOUS MC: ${market_cap}"
+            new_nickname = f"MC: ${market_cap}"
             try:
                 me = guild.me
                 await me.edit(nick=new_nickname)
@@ -60,7 +62,7 @@ async def update_bot_nickname():
                 logging.error(f"Error updating bot nickname: {e}")
         else:
             logging.error("Failed to fetch market cap, skipping update.")
-        await asyncio.sleep(300)  # Update every 5 minutes
+        await asyncio.sleep(60)  # Update every minute
 
 @client.event
 async def on_ready():
