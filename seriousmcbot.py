@@ -2,11 +2,14 @@ import discord
 import requests
 import asyncio
 import os
+from flask import Flask
 
 DISCORD_TOKEN = os.getenv('DISCORD_TOKEN')
 TOKEN_ID = 'serious-coin'
 intents = discord.Intents.default()
 client = discord.Client(intents=intents)
+
+app = Flask(__name__)
 
 def get_market_cap(token_id):
     url = f"https://api.coingecko.com/api/v3/coins/{token_id}"
@@ -39,10 +42,19 @@ async def update_bot_name():
 async def on_ready():
     print(f'Logged in as {client.user.name}')
 
-async def main():
+@app.route('/')
+def home():
+    return "Discord bot is running!"
+
+async def run_bot():
     async with client:
         client.loop.create_task(update_bot_name())
         await client.start(DISCORD_TOKEN)
 
+def main():
+    loop = asyncio.get_event_loop()
+    loop.create_task(run_bot())
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
+
 if __name__ == "__main__":
-    asyncio.run(main())
+    main()
