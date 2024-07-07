@@ -19,6 +19,7 @@ def get_market_cap(token_id):
         response.raise_for_status()  # Check for HTTP errors
         data = response.json()
         market_cap = data['market_data']['market_cap']['usd']
+        print(f"Market cap fetched: {market_cap}")
         return market_cap
     except (requests.exceptions.HTTPError, KeyError) as e:
         print(f"Error fetching market cap: {e}")
@@ -29,7 +30,7 @@ async def update_bot_name():
     while not client.is_closed():
         market_cap = get_market_cap(TOKEN_ID)
         if market_cap is not None:
-            new_name = f"SERIOUS MC: ${market_cap}"
+            new_name = f"$SERIOUS MC: ${market_cap}"
             try:
                 await client.user.edit(username=new_name)
                 print(f"Updated bot name to: {new_name}")
