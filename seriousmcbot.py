@@ -5,6 +5,7 @@ import os
 import logging
 from flask import Flask
 from threading import Thread
+from time import sleep
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -25,8 +26,17 @@ def get_market_cap(token_id):
         market_cap = data['market_data']['market_cap']['usd']
         logging.info(f"Market cap fetched: {market_cap}")
         return market_cap
-    except (requests.exceptions.HTTPError, KeyError) as e:
-        logging.error(f"Error fetching market cap: {e}")
+    except requests.exceptions.HTTPError as e:
+        if e.response.status_code == 429:
+            retry_after = int(e.response.headers.get("Retry-After", 60))
+            logging.error(f"Rate limit exceeded. Retrying after {retry_after} seconds.")
+            sleep(retry_after)
+            return get_market_cap(token_id)
+        else:
+            logging.error(f"Error fetching market cap: {e}")
+            return None
+    except KeyError as e:
+        logging.error(f"Error parsing market cap data: {e}")
         return None
 
 async def update_bot_name():
@@ -34,7 +44,7 @@ async def update_bot_name():
     while not client.is_closed():
         market_cap = get_market_cap(TOKEN_ID)
         if market_cap is not None:
-            new_name = f"SERIOUS MC: ${market_cap}"
+            new_name = f"$SERIOUS MC: ${market_cap}"
             try:
                 await client.user.edit(username=new_name)
                 logging.info(f"Updated bot name to: {new_name}")
@@ -42,7 +52,7 @@ async def update_bot_name():
                 logging.error(f"Error updating bot name: {e}")
         else:
             logging.error("Failed to fetch market cap, skipping update.")
-        await asyncio.sleep(60)  # Update every minute
+        await asyncio.sleep(300)  # Update every 5 minutes
 
 @client.event
 async def on_ready():
