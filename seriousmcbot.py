@@ -3,6 +3,7 @@ import requests
 import asyncio
 import os
 from flask import Flask
+from threading import Thread
 
 DISCORD_TOKEN = os.getenv('DISCORD_TOKEN')
 TOKEN_ID = 'serious-coin'
@@ -46,15 +47,17 @@ async def on_ready():
 def home():
     return "Discord bot is running!"
 
-async def run_bot():
+def run_flask():
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
+
+async def main():
+    # Start the Flask app in a separate thread to prevent blocking
+    flask_thread = Thread(target=run_flask)
+    flask_thread.start()
+    
     async with client:
         client.loop.create_task(update_bot_name())
         await client.start(DISCORD_TOKEN)
 
-def main():
-    loop = asyncio.get_event_loop()
-    loop.create_task(run_bot())
-    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
-
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
