@@ -38,7 +38,7 @@ async def update_bot_name():
                 print(f"Error updating bot name: {e}")
         else:
             print("Failed to fetch market cap, skipping update.")
-        await asyncio.sleep(300)  # Update every 5 minutes
+        await asyncio.sleep(60)  # Update every minute
 
 @client.event
 async def on_ready():
