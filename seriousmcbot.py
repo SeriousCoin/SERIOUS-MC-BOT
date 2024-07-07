@@ -11,7 +11,7 @@ from time import sleep
 logging.basicConfig(level=logging.INFO)
 
 DISCORD_TOKEN = os.getenv('DISCORD_TOKEN')
-TOKEN_ID = '0x7E575f50777f5096f323EB063fD80BA447627060'
+TOKEN_ID = '0x18ab7692cc20F68A550b1Fdd749720CAd4a4894F'
 GUILD_ID = int(os.getenv('GUILD_ID'))
 
 intents = discord.Intents.default()
@@ -20,13 +20,13 @@ client = discord.Client(intents=intents)
 app = Flask(__name__)
 
 def get_market_cap(token_id):
-    url = f"https://api.dexscreener.com/latest/dex/tokens/{token_id}"
+    url = f"https://api.dexscreener.com/latest/dex/pairs/cronos/{token_id}"
     try:
         response = requests.get(url)
         response.raise_for_status()  # Check for HTTP errors
         data = response.json()
-        market_cap = data['fdv']  # Adjust this based on the actual Dexscreener response structure
-        logging.info(f"Market cap fetched: {market_cap}")
+        market_cap = data['pairs'][0]['fdv']  # Using FDV as market cap
+        logging.info(f"Market cap (FDV) fetched: {market_cap}")
         return market_cap
     except requests.exceptions.HTTPError as e:
         if e.response.status_code == 429:
