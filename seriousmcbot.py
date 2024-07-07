@@ -3,9 +3,11 @@ import requests
 import asyncio
 import os
 import logging
-from flask import Flask
+from flask import Flask, jsonify
 from threading import Thread
 from time import sleep
+from hypercorn.asyncio import serve
+from hypercorn.config import Config
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -18,6 +20,14 @@ intents = discord.Intents.default()
 client = discord.Client(intents=intents)
 
 app = Flask(__name__)
+
+@app.route('/')
+def home():
+    return "Discord bot is running!"
+
+@app.route('/heartbeat')
+def heartbeat():
+    return jsonify({"status": "alive"}), 200
 
 def get_market_cap(token_id):
     url = f"https://api.dexscreener.com/latest/dex/pairs/cronos/{token_id}"
@@ -64,35 +74,22 @@ async def update_bot_nickname():
             logging.error("Failed to fetch market cap, skipping update.")
         await asyncio.sleep(60)  # Update every minute
 
-async def send_heartbeat():
-    while True:
-        try:
-            requests.get('http://localhost:5000')
-            logging.info("Heartbeat sent.")
-        except requests.exceptions.RequestException as e:
-            logging.error(f"Heartbeat failed: {e}")
-        await asyncio.sleep(300)  # Send heartbeat every 5 minutes
+async def run_flask():
+    config = Config()
+    config.bind = ["0.0.0.0:5000"]
+    await serve(app, config)
 
 @client.event
 async def on_ready():
     logging.info(f'Logged in as {client.user.name}')
 
-@app.route('/')
-def home():
-    return "Discord bot is running!"
-
-def run_flask():
-    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
-
 async def main():
-    # Start the Flask app in a separate thread to prevent blocking
-    flask_thread = Thread(target=run_flask)
-    flask_thread.start()
+    flask_task = asyncio.create_task(run_flask())
+    bot_task = asyncio.create_task(update_bot_nickname())
     
-    async with client:
-        client.loop.create_task(update_bot_nickname())
-        client.loop.create_task(send_heartbeat())
-        await client.start(DISCORD_TOKEN)
+    await client.start(DISCORD_TOKEN)
+    await flask_task
+    await bot_task
 
 if __name__ == "__main__":
     asyncio.run(main())
