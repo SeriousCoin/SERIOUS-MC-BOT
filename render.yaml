@@ -8,3 +8,5 @@ services:
     envVars:
       - key: DISCORD_TOKEN
         from: secret
+      - key: GUILD_ID
+        value: secret
