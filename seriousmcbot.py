@@ -11,7 +11,7 @@ from time import sleep
 logging.basicConfig(level=logging.INFO)
 
 DISCORD_TOKEN = os.getenv('DISCORD_TOKEN')
-TOKEN_ID = '0x18ab7692cc20f68a550b1fdd749720cad4a4894f'
+TOKEN_ID = '0x7E575f50777f5096f323EB063fD80BA447627060'
 GUILD_ID = int(os.getenv('GUILD_ID'))
 
 intents = discord.Intents.default()
@@ -25,7 +25,7 @@ def get_market_cap(token_id):
         response = requests.get(url)
         response.raise_for_status()  # Check for HTTP errors
         data = response.json()
-        market_cap = data['market_data']['market_cap']  # Adjust this based on the actual Dexscreener response structure
+        market_cap = data['market_data']['fdv']  # Adjust this based on the actual Dexscreener response structure
         logging.info(f"Market cap fetched: {market_cap}")
         return market_cap
     except requests.exceptions.HTTPError as e:
