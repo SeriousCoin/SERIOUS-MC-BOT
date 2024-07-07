@@ -78,13 +78,17 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
+    logging.info(f"Message received: {message.content}")
     if message.author == client.user:
+        logging.info("Message is from the bot itself, ignoring.")
         return
 
     if message.content.lower() == "!serious":
+        logging.info("!serious command detected")
         random_gif = random.choice(GIFS)
         await message.channel.send(random_gif)
-
+        logging.info(f"Sent GIF: {random_gif}")
+        
 @app.route('/')
 def home():
     return "Discord bot is running!"
