@@ -1,61 +1,43 @@
 import discord
-from discord.ext import commands
 import requests
+import asyncio
 import os
-from flask import Flask, jsonify
 
 DISCORD_TOKEN = os.getenv('DISCORD_TOKEN')
-
-COIN_SYMBOL = 'SERIOUS'
-
-# Define intents with required flags
+TOKEN_ID = 'serious-coin'
 intents = discord.Intents.default()
-intents.messages = True  # Required for the bot to receive message events
-intents.message_content = True  # Required for the bot to access message content
+client = discord.Client(intents=intents)
 
-# Initialize the bot with intents
-bot = commands.Bot(command_prefix='!', intents=intents)
-
-@bot.event
-async def on_ready():
-    print(f'We have logged in as {bot.user}')
-
-@bot.command()
-async def marketcap(ctx):
-    url = 'https://api.dexscreener.io/latest/dex/pairs/cronos/0x18ab7692cc20F68A550b1Fdd749720CAd4a4894F'
-    response = requests.get(url)
-
-    if response.status_code == 200:
+def get_market_cap(token_id):
+    url = f"https://api.coingecko.com/api/v3/coins/{token_id}"
+    try:
+        response = requests.get(url)
+        response.raise_for_status()  # Check for HTTP errors
         data = response.json()
-        if 'pair' in data:
-            market_cap = data['pair']['market_cap']
-            await ctx.send(f'The market cap of {COIN_SYMBOL} is {market_cap}')
+        market_cap = data['market_data']['market_cap']['usd']
+        return market_cap
+    except (requests.exceptions.HTTPError, KeyError) as e:
+        print(f"Error fetching market cap: {e}")
+        return None
+
+async def update_bot_name():
+    await client.wait_until_ready()
+    while not client.is_closed():
+        market_cap = get_market_cap(TOKEN_ID)
+        if market_cap is not None:
+            new_name = f"$SERIOUS MC: ${market_cap}"
+            try:
+                await client.user.edit(username=new_name)
+                print(f"Updated bot name to: {new_name}")
+            except discord.errors.HTTPException as e:
+                print(f"Error updating bot name: {e}")
         else:
-            await ctx.send(f'Could not find market cap for {COIN_SYMBOL}')
-    else:
-        await ctx.send(f'Error fetching data: {response.status_code}')
-        print(response.text)  # Print the API response for debugging
+            print("Failed to fetch market cap, skipping update.")
+        await asyncio.sleep(3600)  # Update every hour
 
-# Flask app for health check
-app = Flask(__name__)
+@client.event
+async def on_ready():
+    print(f'Logged in as {client.user.name}')
 
-@app.route('/')
-def index():
-    return 'SERIOUS MC Bot is running!'
-
-@app.route('/health')
-def health_check():
-    return jsonify({'status': 'UP'})
-
-def run_discord_bot():
-    bot.run(DISCORD_TOKEN)
-
-if __name__ == '__main__':
-    import threading
-
-    # Start the Flask app in a separate thread
-    flask_thread = threading.Thread(target=app.run, kwargs={'host': '0.0.0.0', 'port': int(os.environ.get('PORT', 5000))})
-    flask_thread.start()
-
-    # Start the Discord bot
-    run_discord_bot()
+client.loop.create_task(update_bot_name())
+client.run(DISCORD_TOKEN)
