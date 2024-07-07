@@ -25,7 +25,7 @@ def get_market_cap(token_id):
         response = requests.get(url)
         response.raise_for_status()  # Check for HTTP errors
         data = response.json()
-        market_cap = data['market_data']['fdv']  # Adjust this based on the actual Dexscreener response structure
+        market_cap = data['fdv']  # Adjust this based on the actual Dexscreener response structure
         logging.info(f"Market cap fetched: {market_cap}")
         return market_cap
     except requests.exceptions.HTTPError as e:
