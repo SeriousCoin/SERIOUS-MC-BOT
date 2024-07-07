@@ -2,8 +2,12 @@ import discord
 import requests
 import asyncio
 import os
+import logging
 from flask import Flask
 from threading import Thread
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
 
 DISCORD_TOKEN = os.getenv('DISCORD_TOKEN')
 TOKEN_ID = 'serious-coin'
@@ -19,10 +23,10 @@ def get_market_cap(token_id):
         response.raise_for_status()  # Check for HTTP errors
         data = response.json()
         market_cap = data['market_data']['market_cap']['usd']
-        print(f"Market cap fetched: {market_cap}")
+        logging.info(f"Market cap fetched: {market_cap}")
         return market_cap
     except (requests.exceptions.HTTPError, KeyError) as e:
-        print(f"Error fetching market cap: {e}")
+        logging.error(f"Error fetching market cap: {e}")
         return None
 
 async def update_bot_name():
@@ -30,19 +34,19 @@ async def update_bot_name():
     while not client.is_closed():
         market_cap = get_market_cap(TOKEN_ID)
         if market_cap is not None:
-            new_name = f"$SERIOUS MC: ${market_cap}"
+            new_name = f"SERIOUS MC: ${market_cap}"
             try:
                 await client.user.edit(username=new_name)
-                print(f"Updated bot name to: {new_name}")
+                logging.info(f"Updated bot name to: {new_name}")
             except discord.errors.HTTPException as e:
-                print(f"Error updating bot name: {e}")
+                logging.error(f"Error updating bot name: {e}")
         else:
-            print("Failed to fetch market cap, skipping update.")
+            logging.error("Failed to fetch market cap, skipping update.")
         await asyncio.sleep(60)  # Update every minute
 
 @client.event
 async def on_ready():
-    print(f'Logged in as {client.user.name}')
+    logging.info(f'Logged in as {client.user.name}')
 
 @app.route('/')
 def home():
