@@ -4,7 +4,7 @@ services:
     env: python
     plan: free
     buildCommand: "pip install -r requirements.txt"
-    startCommand: "python seriousmcbot.py"
+    startCommand: "gunicorn -w 4 -b 0.0.0.0:5000 seriousmcbot:app"
     envVars:
       - key: DISCORD_TOKEN
         from: secret
