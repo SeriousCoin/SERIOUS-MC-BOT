@@ -9,6 +9,7 @@ from threading import Thread
 from time import sleep
 from hypercorn.asyncio import serve
 from hypercorn.config import Config
+from discord_components import DiscordComponents, Button, ButtonStyle
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -86,6 +87,7 @@ async def update_bot_nickname():
 @client.event
 async def on_ready():
     logging.info(f'Logged in as {client.user.name}')
+    DiscordComponents(client)
 
 @client.event
 async def on_message(message):
@@ -98,6 +100,19 @@ async def on_message(message):
         gif_url = random.choice(GIF_URLS)
         await message.channel.send(gif_url)
         logging.info(f"Sent GIF: {gif_url}")
+
+    if message.content.lower() == "!chart":
+        await message.channel.send(
+            "Click the button below to view the chart:",
+            components=[
+                Button(
+                    style=ButtonStyle.URL,
+                    label="Dexscreener",
+                    url="https://dexscreener.com/cronos/0x18ab7692cc20f68a550b1fdd749720cad4a4894f"
+                )
+            ]
+        )
+        logging.info("Sent Dexscreener button")
 
 async def run_flask():
     config = Config()
