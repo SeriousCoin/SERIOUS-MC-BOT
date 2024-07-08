@@ -96,15 +96,27 @@ async def serious(ctx):
 
 @bot.command()
 async def chart(ctx):
-    button = discord.ui.Button(
+    button1 = discord.ui.Button(
         style=discord.ButtonStyle.url,
         label="Dexscreener",
         url="https://dexscreener.com/cronos/0x18ab7692cc20f68a550b1fdd749720cad4a4894f"
     )
+    button2 = discord.ui.Button(
+        style=discord.ButtonStyle.url,
+        label="DexTools",
+        url="https://www.dextools.io/app/en/cronos/pair-explorer/0x18ab7692cc20f68a550b1fdd749720cad4a4894f"
+    )
+    button3 = discord.ui.Button(
+        style=discord.ButtonStyle.url,
+        label="CoinGecko",
+        url="https://www.coingecko.com/en/coins/serious-coin"
+    )
     view = discord.ui.View()
-    view.add_item(button)
+    view.add_item(button1)
+    view.add_item(button2)
+    view.add_item(button3)
     await ctx.send(view=view)
-    logging.info("Sent Dexscreener button")
+    logging.info("Sent Chart Links")
 
 async def run_flask():
     config = Config()
