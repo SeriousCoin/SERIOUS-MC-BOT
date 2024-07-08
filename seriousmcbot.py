@@ -95,7 +95,7 @@ async def on_message(message):
     if message.author == bot.user:
         return
 
-    if "!serious" in message.content.lower():
+    if "serious" in message.content.lower() and message.content.lower() != "!serious":
         await bot.get_command('serious').invoke(await bot.get_context(message))
         logging.info(f"Invoked !serious command")
 
