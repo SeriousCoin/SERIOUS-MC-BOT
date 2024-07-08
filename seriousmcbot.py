@@ -9,7 +9,7 @@ from threading import Thread
 from time import sleep
 from hypercorn.asyncio import serve
 from hypercorn.config import Config
-from discord_components import DiscordComponents, Button, ButtonStyle
+from discord.ext import commands
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -22,7 +22,7 @@ intents = discord.Intents.default()
 intents.messages = True  # Enable message intent
 intents.guilds = True  # Enable guilds intent
 intents.message_content = True  # Ensure message content intent is enabled
-client = discord.Client(intents=intents)
+bot = commands.Bot(command_prefix='!', intents=intents)
 
 app = Flask(__name__)
 
@@ -64,13 +64,13 @@ def get_market_cap(token_id):
         return None
 
 async def update_bot_nickname():
-    await client.wait_until_ready()
-    guild = client.get_guild(GUILD_ID)
+    await bot.wait_until_ready()
+    guild = bot.get_guild(GUILD_ID)
     if guild is None:
         logging.error(f"Guild with ID {GUILD_ID} not found")
         return
     
-    while not client.is_closed():
+    while not bot.is_closed():
         market_cap = get_market_cap(TOKEN_ID)
         if market_cap is not None:
             new_nickname = f"MC: ${market_cap}"
@@ -87,7 +87,6 @@ async def update_bot_nickname():
 @client.event
 async def on_ready():
     logging.info(f'Logged in as {client.user.name}')
-    DiscordComponents(client)
 
 @client.event
 async def on_message(message):
@@ -105,8 +104,8 @@ async def on_message(message):
         await message.channel.send(
             "Click the button below to view the chart:",
             components=[
-                Button(
-                    style=ButtonStyle.URL,
+                discord.ui.Button(
+                    style=discord.ButtonStyle.url,
                     label="Dexscreener",
                     url="https://dexscreener.com/cronos/0x18ab7692cc20f68a550b1fdd749720cad4a4894f"
                 )
@@ -123,7 +122,7 @@ async def main():
     flask_task = asyncio.create_task(run_flask())
     bot_task = asyncio.create_task(update_bot_nickname())
     
-    await client.start(DISCORD_TOKEN)
+    await bot.start(DISCORD_TOKEN)
     await flask_task
     await bot_task
 
