@@ -87,12 +87,14 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
+    logging.info(f"Received message: {message.content}")
     if message.author == client.user:
         return
 
     if message.content.lower() == "!serious":
         gif_url = random.choice(GIF_URLS)
         await message.channel.send(gif_url)
+        logging.info(f"Sent GIF: {gif_url}")
 
 async def run_flask():
     config = Config()
