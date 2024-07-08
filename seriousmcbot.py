@@ -88,6 +88,19 @@ async def update_bot_nickname():
 async def on_ready():
     logging.info(f'Logged in as {bot.user.name}')
 
+@bot.event
+async def on_message(message):
+    logging.info(f"Received message: {message.content}")
+    logging.info(f"Message author: {message.author}, Bot user: {bot.user}")
+    if message.author == bot.user:
+        return
+
+    if "!serious" in message.content.lower():
+        await bot.get_command('serious').invoke(await bot.get_context(message))
+        logging.info(f"Invoked !serious command")
+
+    await bot.process_commands(message)
+
 @bot.command()
 async def serious(ctx):
     gif_url = random.choice(GIF_URLS)
