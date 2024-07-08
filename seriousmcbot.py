@@ -3,6 +3,7 @@ import requests
 import asyncio
 import os
 import logging
+import random
 from flask import Flask, jsonify
 from threading import Thread
 from time import sleep
@@ -17,9 +18,15 @@ TOKEN_ID = '0x18ab7692cc20F68A550b1Fdd749720CAd4a4894F'
 GUILD_ID = int(os.getenv('GUILD_ID'))  # The ID of the server (guild) where you want to change the nickname
 
 intents = discord.Intents.default()
+intents.messages = True  # Enable message intent
 client = discord.Client(intents=intents)
 
 app = Flask(__name__)
+
+GIF_URLS = [
+    "https://tenor.com/view/serious-crypto-meme-toast-great-gatsby-gif-5956985317763125460",
+    "https://tenor.com/view/wen-serious-crypto-meme-gif-16719925296958383434"
+]
 
 @app.route('/')
 def home():
@@ -74,14 +81,23 @@ async def update_bot_nickname():
             logging.error("Failed to fetch market cap, skipping update.")
         await asyncio.sleep(60)  # Update every minute
 
+@client.event
+async def on_ready():
+    logging.info(f'Logged in as {client.user.name}')
+
+@client.event
+async def on_message(message):
+    if message.author == client.user:
+        return
+
+    if message.content.lower() == "!serious":
+        gif_url = random.choice(GIF_URLS)
+        await message.channel.send(gif_url)
+
 async def run_flask():
     config = Config()
     config.bind = ["0.0.0.0:5000"]
     await serve(app, config)
-
-@client.event
-async def on_ready():
-    logging.info(f'Logged in as {client.user.name}')
 
 async def main():
     flask_task = asyncio.create_task(run_flask())
