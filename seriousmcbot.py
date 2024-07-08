@@ -84,11 +84,11 @@ async def update_bot_nickname():
             logging.error("Failed to fetch market cap, skipping update.")
         await asyncio.sleep(60)  # Update every minute
 
-@client.event
+@bot.event
 async def on_ready():
     logging.info(f'Logged in as {client.user.name}')
 
-@client.event
+@bot.event
 async def on_message(message):
     logging.info(f"Received message: {message.content}")
     logging.info(f"Message author: {message.author}, Bot user: {client.user}")
