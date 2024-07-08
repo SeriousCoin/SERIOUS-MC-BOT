@@ -22,7 +22,7 @@ intents = discord.Intents.default()
 intents.messages = True  # Enable message intent
 intents.guilds = True  # Enable guilds intent
 intents.message_content = True  # Ensure message content intent is enabled
-bot = commands.Bot(command_prefix='!', intents=intents)
+bot = commands.Bot(command_prefix='!', intents=intents, case_insensitive=True)
 
 app = Flask(__name__)
 
@@ -103,7 +103,7 @@ async def chart(ctx):
     )
     view = discord.ui.View()
     view.add_item(button)
-    await ctx.send("Click the button below to view the chart:", view=view)
+    await ctx.send(view=view)
     logging.info("Sent Dexscreener button")
 
 async def run_flask():
