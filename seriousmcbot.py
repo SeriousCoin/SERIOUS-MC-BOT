@@ -94,7 +94,7 @@ async def on_message(message):
     if message.author == client.user:
         return
 
-    if message.content.lower() == "!serious":
+    if "!serious" in message.content.lower():
         gif_url = random.choice(GIF_URLS)
         await message.channel.send(gif_url)
         logging.info(f"Sent GIF: {gif_url}")
