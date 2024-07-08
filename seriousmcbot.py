@@ -118,6 +118,30 @@ async def chart(ctx):
     await ctx.send(view=view)
     logging.info("Sent Chart Links")
 
+@bot.command()
+async def trade(ctx):
+    button1 = discord.ui.Button(
+        style=discord.ButtonStyle.url,
+        label="VVS",
+        url="https://vvs.finance/swap?outputCurrency=0x7E575f50777f5096f323EB063fD80BA447627060"
+    )
+    button2 = discord.ui.Button(
+        style=discord.ButtonStyle.url,
+        label="Wolfswap",
+        url="https://wolfswap.app/?chainId=25&sellToken=0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE&buyToken=0x7E575f50777f5096f323EB063fD80BA447627060"
+    )
+    button3 = discord.ui.Button(
+        style=discord.ButtonStyle.url,
+        label="DooSwap",
+        url="https://swap.doonft.com/?output=0x7E575f50777f5096f323EB063fD80BA447627060"
+    )
+    view = discord.ui.View()
+    view.add_item(button1)
+    view.add_item(button2)
+    view.add_item(button3)
+    await ctx.send(view=view)
+    logging.info("Sent Trade Links")
+
 async def run_flask():
     config = Config()
     config.bind = ["0.0.0.0:5000"]
