@@ -86,7 +86,7 @@ async def update_bot_nickname():
 
 @bot.event
 async def on_ready():
-    logging.info(f'Logged in as {client.user.name}')
+    logging.info(f'Logged in as {bot.user.name}')
 
 @bot.event
 async def on_message(message):
