@@ -91,8 +91,8 @@ async def on_ready():
 @bot.event
 async def on_message(message):
     logging.info(f"Received message: {message.content}")
-    logging.info(f"Message author: {message.author}, Bot user: {client.user}")
-    if message.author == client.user:
+    logging.info(f"Message author: {message.author}, Bot user: {bot.user}")
+    if message.author == bot.user:
         return
 
     if "!serious" in message.content.lower():
