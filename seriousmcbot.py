@@ -19,13 +19,15 @@ GUILD_ID = int(os.getenv('GUILD_ID'))  # The ID of the server (guild) where you 
 
 intents = discord.Intents.default()
 intents.messages = True  # Enable message intent
+intents.guilds = True  # Enable guilds intent
+intents.message_content = True  # Ensure message content intent is enabled
 client = discord.Client(intents=intents)
 
 app = Flask(__name__)
 
 GIF_URLS = [
-    "https://tenor.com/view/serious-crypto-meme-toast-great-gatsby-gif-5956985317763125460",
-    "https://tenor.com/view/wen-serious-crypto-meme-gif-16719925296958383434"
+    "https://tenor.com/view/wen-serious-crypto-meme-gif-16719925296958383434",
+    "https://tenor.com/view/serious-crypto-meme-toast-great-gatsby-gif-5956985317763125460"
 ]
 
 @app.route('/')
@@ -88,6 +90,7 @@ async def on_ready():
 @client.event
 async def on_message(message):
     logging.info(f"Received message: {message.content}")
+    logging.info(f"Message author: {message.author}, Bot user: {client.user}")
     if message.author == client.user:
         return
 
