@@ -88,28 +88,23 @@ async def update_bot_nickname():
 async def on_ready():
     logging.info(f'Logged in as {bot.user.name}')
 
-@bot.event
-async def on_message(message):
-    logging.info(f"Received message: {message.content}")
-    logging.info(f"Message author: {message.author}, Bot user: {bot.user}")
-    if message.author == bot.user:
-        return
+@bot.command()
+async def serious(ctx):
+    gif_url = random.choice(GIF_URLS)
+    await ctx.send(gif_url)
+    logging.info(f"Sent GIF: {gif_url}")
 
-    if "!serious" in message.content.lower():
-        gif_url = random.choice(GIF_URLS)
-        await message.channel.send(gif_url)
-        logging.info(f"Sent GIF: {gif_url}")
-
-    if message.content.lower() == "!chart":
-         button = discord.ui.Button(
-            style=discord.ButtonStyle.url,
-            label="Dexscreener",
-            url="https://dexscreener.com/cronos/0x18ab7692cc20f68a550b1fdd749720cad4a4894f"
-        )
-        view = discord.ui.View()
-        view.add_item(button)
-        await message.channel.send("Click the button below to view the chart:", view=view)
-        logging.info("Sent Dexscreener button")
+@bot.command()
+async def chart(ctx):
+    button = discord.ui.Button(
+        style=discord.ButtonStyle.url,
+        label="Dexscreener",
+        url="https://dexscreener.com/cronos/0x18ab7692cc20f68a550b1fdd749720cad4a4894f"
+    )
+    view = discord.ui.View()
+    view.add_item(button)
+    await ctx.send("Click the button below to view the chart:", view=view)
+    logging.info("Sent Dexscreener button")
 
 async def run_flask():
     config = Config()
