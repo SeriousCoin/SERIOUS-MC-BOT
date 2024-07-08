@@ -142,6 +142,30 @@ async def trade(ctx):
     await ctx.send(view=view)
     logging.info("Sent Trade Links")
 
+@bot.command()
+async def website(ctx):
+    button = discord.ui.Button(
+        style=discord.ButtonStyle.url,
+        label="seriouscoin.xyz",
+        url="https://seriouscoin.xyz/"
+    )
+    view = discord.ui.View()
+    view.add_item(button)
+    await ctx.send(view=view)
+    logging.info("Sent Website Link")
+
+@bot.command(aliases=['x'])
+async def twitter(ctx):
+    button = discord.ui.Button(
+        style=discord.ButtonStyle.url,
+        label="@realseriouscoin",
+        url="https://twitter.com/realseriouscoin"
+    )
+    view = discord.ui.View()
+    view.add_item(button)
+    await ctx.send(view=view)
+    logging.info("Sent Website Link")
+
 async def run_flask():
     config = Config()
     config.bind = ["0.0.0.0:5000"]
