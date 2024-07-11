@@ -29,7 +29,9 @@ app = Flask(__name__)
 GIF_URLS = [
     "https://tenor.com/view/wen-serious-crypto-meme-gif-16719925296958383434",
     "https://tenor.com/view/serious-crypto-meme-toast-great-gatsby-gif-5956985317763125460",
-    "https://tenor.com/view/serious-crypto-meme-simpsons-fomo-gif-16277228491402172688"
+    "https://tenor.com/view/serious-crypto-meme-simpsons-fomo-gif-16277228491402172688",
+    "https://tenor.com/view/serious-meme-zach-galifianakis-math-gif-9774840910078999894",
+    "https://tenor.com/view/serious-star-wars-chart-meme-gif-15521566603117595458"
 ]
 
 @app.route('/')
@@ -96,7 +98,7 @@ async def on_message(message):
     if message.author == bot.user:
         return
 
-    if "serious" in message.content.lower() and message.content.lower() != "!serious":
+    if "!serious" in message.content.lower() and message.content.lower() != "!serious":
         await bot.get_command('serious').invoke(await bot.get_context(message))
         logging.info(f"Invoked !serious command")
 
